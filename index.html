@@ -1,8 +1,15 @@
-<html>
-    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="bundle.js"></script>
-<body>
-    <div id="message">Hello</div>
-    <input id="button" type="button" value="Say Something"/>
+<html ng-app="lunchRoom">
+<head>
+    <link rel="stylesheet" type="text/css" href="src/styles/style.css">
+</head>
+<body ng-view compose-with-keystrokes>
+  <script src="bundle.js"></script>
+  <script src="node_modules/angular/angular.js"></script>
+  <script src="node_modules/angular-route/angular-route.js"></script>
+  <script src="index.js"></script>
+  <script src="src/scripts/controllers/main.js"></script>
+  <script src="src/scripts/directives/compose-with-keystrokes.js"></script>
+  <script src="src/scripts/directives/compose-message.js"></script>
+  <script src="src/scripts/directives/speech-bubble.js"></script>
 </body>
 </html>

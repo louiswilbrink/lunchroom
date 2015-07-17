@@ -5,54 +5,37 @@ var Size = Famous.components.Size;
 var Position = Famous.components.Position;
 var Transitionable = Famous.transitions.Transitionable;
 
-var scene = FamousEngine.createScene();
+window.Famous = Famous;
+window.FamousEngine = Famous.core.FamousEngine;
+window.DOMElement = Famous.domRenderables.DOMElement;
+window.Size = Famous.components.Size;
+window.Position = Famous.components.Position;
+window.Transitionable = Famous.transitions.Transitionable;
 
-var myNode = scene.addChild();
+//var scene = FamousEngine.createScene();
 
-var myDOMElement = new DOMElement(myNode);
+//var myNode = scene.addChild();
+//var mySize = new Size(myNode)
+        //.setMode('absolute', 'absolute', 'absolute')
+        //.setAbsolute(150, 150);
+//var myDOMElement = new DOMElement(myNode)
+        //.setProperty('background-color', 'lightblue')
+        //.setContent('Famous!');
+//var myPosition = new Position(myNode)
+        //.set(100, 150, 0);
 
-myDOMElement.setProperty('background-color', 'lightblue')
-    .setContent('Famous!');
+//var myTransitionable = new Transitionable(100);
 
-var mySize = new Size(myNode);
+//var myUpdateId = myNode.addComponent({
+    //onUpdate: function (time) {
+        //var newPosition = myTransitionable.get();
+        //console.log(newPosition);
+        //myNode.setPosition(newPosition, 150, 0);
 
-mySize.setMode('absolute', 'absolute', 'absolute')
-    .setAbsolute(150, 150);
+        //if (myTransitionable.isActive()) {
+              //myNode.requestUpdate(myUpdateId);
+        //}
+    //}
+//});
 
-var myPosition = new Position(myNode);
-
-myPosition.set(100, 50, 0);
-
-var myTransitionable = new Transitionable(0);
-
-myTransitionable.set(500, { duration: 1000 });
-
-// Adding a component that allows this node to
-// hook into the update loop of the scene.
-var myUpdateId = myNode.addComponent({
-    onUpdate: function (time) {
-        // Set a new position based on the current value
-        // of myTransitionable.
-        myNode.setPosition(myTransitionable.get(), 150, 0);
-
-        // Once myTransitionable has reached its final value,
-        // it will no longer be active and this update process
-        // can stop.  Otherwise, call it continuously.
-        if (myTransitionable.isActive()) {
-              myNode.requestUpdate(myUpdateId);
-        }
-    }
-});
-
-myNode.requestUpdate(myUpdateId);
-
-FamousEngine.init();
-
-var button = $('#button');
-
-button.click(function () {
-    console.log('hello');
-});
-
-console.log(button);
-
+//FamousEngine.init();
