@@ -1,50 +1,81 @@
 'use strict'
 
 angular.module('lunchRoom')
-    .directive('speechBubble', ['$rootScope', function ($rootScope) {
+    .directive('speechBubble', ['$rootScope', '$window', function ($rootScope, $window) {
     
     var directiveDefinitionObject = {
-        template: '<div>{{ speechBubble }}</div>',
-        restrict: 'E',
-        replace: true,
+        template: '<div class="speech-bubble">{{ speechBubble }}</div>',
+        restrict: 'A',
         controller: function () {
+
+            var scene = FamousEngine.createScene('.speech-bubble');
+            console.log(scene);
+
+            var startingPosition = [
+                    ($window.innerWidth / 2) - 200, // X
+                    ($window.innerHeight / 2) - 75  // Y
+                ];
+
+            var endingPosition = [
+                    ($window.innerWidth / 2) - 200, // X
+                    ($window.innerHeight / 2) - 400 // Y
+                ];
+
+            var myNode = scene.addChild();
+
+            var mySize = new Size(myNode)
+                .setMode('absolute', 'absolute', 'absolute')
+                .setAbsolute(400, 150);
+
+            var myDOMElement = new DOMElement(myNode)
+                .setProperty('background-color', 'lightblue')
+                .setProperty('opacity', '0')
+                .setContent('Famous!');
+
+            var myPosition = new Position(myNode)
+                .set(startingPosition[0], startingPosition[1]);
+
+            // Set transitionable to start from the starting position.
+            var myTransitionable = new Transitionable([
+                startingPosition[1], // Y
+                0]);                 // Opacity
+
+            FamousEngine.init();
+
+            var myUpdateId = myNode.addComponent({
+                // Transition the speech bubble up and fade opacity.
+                onUpdate: function (time) {
+                    var newPositionOpacity = myTransitionable.get();
+                    myPosition.setY(newPositionOpacity[0]);
+                    myDOMElement.setProperty('opacity', newPositionOpacity[1]);
+
+                    if (myTransitionable.isActive()) {
+                        myNode.requestUpdate(myUpdateId);
+                    }
+                    else {
+                        myNode.dismount();
+                    }
+                }
+            });
+
 
             $rootScope.$on('messageComposed', function () {
                 $rootScope.speechBubble = $rootScope.message;
                 $rootScope.message = 'Start typing';
                 $rootScope.$digest();
 
-            var scene = FamousEngine.createScene();
+                myTransitionable.set([
+                    endingPosition[1], // Y
+                    1],                // Opacity 
+                    { duration: '1000' });
 
-var myNode = scene.addChild();
-var mySize = new Size(myNode)
-        .setMode('absolute', 'absolute', 'absolute')
-        .setAbsolute(150, 150);
-var myDOMElement = new DOMElement(myNode)
-        .setProperty('background-color', 'lightblue')
-        .setContent('Famous!');
-var myPosition = new Position(myNode)
-        .set(100, 150, 0);
+                myDOMElement.setContent($rootScope.speechBubble);
 
-var myTransitionable = new Transitionable(100);
-
-var myUpdateId = myNode.addComponent({
-    onUpdate: function (time) {
-        var newPosition = myTransitionable.get();
-        console.log(newPosition);
-        myNode.setPosition(newPosition, 150, 0);
-
-        if (myTransitionable.isActive()) {
-              myNode.requestUpdate(myUpdateId);
-        }
-    }
-});
-
-FamousEngine.init();
-
-myTransitionable.set(500, { duration: '1000' });
-
-myNode.requestUpdate(myUpdateId);
+                console.log(myNode);
+                if (!myNode._mounted) {
+                    myNode.mount('body/0');
+                }
+                myNode.requestUpdate(myUpdateId);
             });
 
         }
