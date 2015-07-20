@@ -4,7 +4,7 @@ angular.module('lunchRoom')
     .directive('speechBubble', ['$rootScope', '$window', function ($rootScope, $window) {
     
     var directiveDefinitionObject = {
-        template: '<div class="speech-bubble">{{ speechBubble }}</div>',
+        template: '<div class="speech-bubble"></div>',
         restrict: 'A',
         controller: function () {
 
@@ -12,20 +12,20 @@ angular.module('lunchRoom')
             console.log(scene);
 
             var startingPosition = [
-                    ($window.innerWidth / 2) - 200, // X
-                    ($window.innerHeight / 2) - 75  // Y
+                    0, // X
+                    250  // Y
                 ];
 
             var endingPosition = [
-                    ($window.innerWidth / 2) - 200, // X
-                    ($window.innerHeight / 2) - 400 // Y
+                    0, // X
+                    50 // Y
                 ];
 
             var myNode = scene.addChild();
 
             var mySize = new Size(myNode)
                 .setMode('absolute', 'absolute', 'absolute')
-                .setAbsolute(400, 150);
+                .setAbsolute(300, 150);
 
             var myDOMElement = new DOMElement(myNode)
                 .setProperty('background-color', 'lightblue')
@@ -36,45 +36,40 @@ angular.module('lunchRoom')
                 .set(startingPosition[0], startingPosition[1]);
 
             // Set transitionable to start from the starting position.
-            var myTransitionable = new Transitionable([
-                startingPosition[1], // Y
-                0]);                 // Opacity
+            var transitionY = new Transitionable(startingPosition[1]);
+            var transitionOpacity = new Transitionable(0);
 
             FamousEngine.init();
 
             var myUpdateId = myNode.addComponent({
                 // Transition the speech bubble up and fade opacity.
                 onUpdate: function (time) {
-                    var newPositionOpacity = myTransitionable.get();
-                    myPosition.setY(newPositionOpacity[0]);
-                    myDOMElement.setProperty('opacity', newPositionOpacity[1]);
+                    var newY = transitionY.get();
+                    var newOpacity = transitionOpacity.get();
+                    myPosition.setY(newY);
+                    myDOMElement.setProperty('opacity', newOpacity);
 
-                    if (myTransitionable.isActive()) {
+                    if (transitionY.isActive() || transitionOpacity.isActive()) {
                         myNode.requestUpdate(myUpdateId);
-                    }
-                    else {
-                        myNode.dismount();
                     }
                 }
             });
 
-
             $rootScope.$on('messageComposed', function () {
+                // Reset position and transparency.
+                myPosition.set(startingPosition[0], startingPosition[1]);
+                transitionY.set(startingPosition[1]);
+                transitionOpacity.set(0);
+
                 $rootScope.speechBubble = $rootScope.message;
                 $rootScope.message = 'Start typing';
                 $rootScope.$digest();
 
-                myTransitionable.set([
-                    endingPosition[1], // Y
-                    1],                // Opacity 
-                    { duration: '1000' });
+                transitionY.set(endingPosition[1], { duration: 1000, curve: 'outQuint' });
+                transitionOpacity.set(1, { duration: 200 });
 
                 myDOMElement.setContent($rootScope.speechBubble);
 
-                console.log(myNode);
-                if (!myNode._mounted) {
-                    myNode.mount('body/0');
-                }
                 myNode.requestUpdate(myUpdateId);
             });
 
