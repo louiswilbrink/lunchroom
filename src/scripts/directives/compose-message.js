@@ -4,8 +4,8 @@ angular.module('lunchRoom')
     .directive('composeMessage', ['$rootScope', function ($rootScope) {
     
     var directiveDefinitionObject = {
-        template: '<div class="message">{{ message }}</div>',
-        restrict: 'E'
+        template: '<div>{{ message }}</div>',
+        restrict: 'A'
     };
 
     return directiveDefinitionObject;
